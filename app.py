@@ -73,7 +73,7 @@ def retriever(query: str) -> list[Document]:
 retriever.batch(
     [
         "what is the name?",
-        "what is the address and number?",
+        "what is the address and number y?",
     ],
 )
 
