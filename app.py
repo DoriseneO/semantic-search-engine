@@ -9,8 +9,8 @@ from langchain_core.documents import Document
 from langchain_core.runnables import chain
 from typing import List
 from langchain.globals import set_debug, get_debug
-
-
+from langchain.chat_models import init_chat_model
+from langchain_core.messages import HumanMessage, SystemMessage
 set_debug(True)  # Enables debugging
 
 if not os.environ.get("OPENAI_API_KEY"):
@@ -58,22 +58,33 @@ vector_store = Chroma(embedding_function=embedding)
 saved_vector = vector_store.add_documents(documents=text)
 # print(saved_vector)
 
-#check the saved vectir
-# print(results[0])
-
-#set retrivers to retrive query
-#this sections,i imported chain and documents
-# Define retriever with the @chain decorator
+#set retrivers to retrive query # Define retriever with the @chain decorator
 @chain
 def retriever(query: str) -> list[Document]:
     result = vector_store.similarity_search(query, k=1)
     return result
 
-# Run batch processing and print the results
-retriever.batch(
-    [
-        "what is the name?",
-        "what is the address and number y?",
-    ],
-)
+#an input to ask a query
+query = input("Ask me a question based on the PDF (or type 'exit' to quit): \n USER: ")
+  
+def chat():
+     while True:
+        # User input for the question
+        query = input()
+       
+        # If the user types 'exit', break the loop
+        if query == 'exit':
+            print("Exiting the program.")
+            break
 
+
+#use chat model
+model = init_chat_model("gpt-4o-mini", model_provider="openai")
+messages =[
+    SystemMessage("you are answering the question based on the content provided"),
+    HumanMessage(content=query)
+]
+
+result = model.invoke(messages)
+chat()
+print(result)
